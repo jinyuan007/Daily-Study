@@ -1,0 +1,26 @@
+# ZookeeperRegistry
+- ZookeeperRegistryFactory
+  - 继承AbstractRegistryFactory
+  - 构造参数需要传入一个ZookeeperTransporter
+  - 能够创建出ZookeeperRegistry对象
+- ZookeeperTransporter 提供连接zk地址，返回client的方法。通过SPI暴露出去
+  - AbstractZookeeperTransporter 
+    - 内部实现了针对client的缓存，在获取连接的时,根据地址 从缓存中找到一个可用的连接客户端就返回，都不存在创建新的Client
+    - 默认实现CuratorZookeeperTransporter
+    - 对外暴露三种消息类型
+      - StateListener
+      - ChildListener
+      - DataListener
+- ZookeeperClient 封装了ZK集群的节点操作、监听操作
+  - AbstractZookeeperClient
+
+- ZookeeperRegistry
+  - 实现了Registry接口，对外提供了基于Zk的注册URL和取消URL，订阅watch和取消订阅
+  - 初始化时订阅状态监听
+  - 注册/取消URL:
+    - 首先把URL转成对应的path节点：
+    - 通过client 创建和删除对应path的节点
+    - 订阅一个NotifyListener(Dubbo定义的监听)
+      - 首先解析PATH找到对应的path，封装用户的NotifyListener创建一个ChildListener(Dubbo封装的ZK事件监听),然后调用zkClient注册上去
+      - 需要维护NotifyListener 和 ChildListener 的映射关系
+    - 取消订阅NotifyListener(Dubbo定义的监听)，通过映射关系找到对应ZK监听，然后调用client删除

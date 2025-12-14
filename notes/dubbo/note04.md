@@ -33,7 +33,7 @@ public class Transporter$Adaptive implements Transporter {
         URL url = arg0; 
         //假设@Adaptive注解是@Adaptive(value = "client,transporter") 
         // SPI接口的default是@SPI(value = "netty")
-        // 优先从URL中的client参数获取，其次是transporter参数,最后是@SPI注解中的默认值 
+        // 优先从URL中的client参数对应的值，找到以这个值为名称的实现类，其次是transporter参数,最后是@SPI注解中的默认值对应的实现类
         String extName = url.getParameter("client",url.getParameter("transporter", "netty")); 
         if (extName == null) 
             throw new IllegalStateException("..."); 
